@@ -26,14 +26,14 @@ export async function GET(request: NextRequest) {
         });
 
         // Get actor info
-        const actorIds = [...new Set(notifications.filter(n => n.actorId).map(n => n.actorId as string))];
+        const actorIds = [...new Set(notifications.filter((n: any) => n.actorId).map((n: any) => n.actorId as string))];
         const actors = await prisma.user.findMany({
             where: { id: { in: actorIds } },
             select: { id: true, username: true, image: true },
         });
-        const actorMap = new Map(actors.map(a => [a.id, a]));
+        const actorMap = new Map(actors.map((a: any) => [a.id, a]));
 
-        const formattedNotifications = notifications.map(n => ({
+        const formattedNotifications = notifications.map((n: any) => ({
             id: n.id,
             type: n.type,
             title: n.title,

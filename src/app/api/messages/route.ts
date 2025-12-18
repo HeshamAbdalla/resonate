@@ -30,10 +30,10 @@ export async function GET() {
         });
 
         // Get other participants' user info
-        const otherUserIds = participants.flatMap(p =>
+        const otherUserIds = participants.flatMap((p: any) =>
             p.conversation.participants
-                .filter(part => part.userId !== user.id)
-                .map(part => part.userId)
+                .filter((part: any) => part.userId !== user.id)
+                .map((part: any) => part.userId)
         );
 
         const users = await prisma.user.findMany({
@@ -41,12 +41,12 @@ export async function GET() {
             select: { id: true, username: true, image: true, name: true },
         });
 
-        const userMap = new Map(users.map(u => [u.id, u]));
+        const userMap = new Map(users.map((u: any) => [u.id, u]));
 
-        const conversations = participants.map(p => {
+        const conversations = participants.map((p: any) => {
             const otherParticipants = p.conversation.participants
-                .filter(part => part.userId !== user.id)
-                .map(part => {
+                .filter((part: any) => part.userId !== user.id)
+                .map((part: any) => {
                     const u = userMap.get(part.userId);
                     return {
                         id: part.userId,

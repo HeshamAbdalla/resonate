@@ -9,7 +9,7 @@ export function extractMentions(content: string): string[] {
     const mentionRegex = /@([a-zA-Z0-9_]{3,20})\b/g;
     const matches = content.match(mentionRegex) || [];
     // Remove @ and deduplicate
-    return [...new Set(matches.map(m => m.slice(1).toLowerCase()))];
+    return [...new Set(matches.map((m: string) => m.slice(1).toLowerCase()))];
 }
 
 /**

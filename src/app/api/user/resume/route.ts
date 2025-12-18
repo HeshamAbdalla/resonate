@@ -73,9 +73,9 @@ export async function GET(request: NextRequest) {
         ]);
 
         // Combine unique post IDs
-        const commentedPostIds = commentedPosts.map(c => c.postId);
+        const commentedPostIds = commentedPosts.map((c: any) => c.postId);
         const followedPostMap = new Map<string, FollowedPostData>(
-            followedPosts.map(f => [f.postId, f])
+            followedPosts.map((f: any) => [f.postId, f])
         );
         const allPostIds = [...new Set([...commentedPostIds, ...followedPostMap.keys()])];
 
@@ -118,27 +118,27 @@ export async function GET(request: NextRequest) {
         const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
 
         // Process each post to calculate resume state
-        const conversations = (posts as unknown as PostData[]).map(post => {
+        const conversations = (posts as unknown as PostData[]).map((post: any) => {
             const followed = followedPostMap.get(post.id);
             const lastVisitAt = followed?.lastViewedAt || new Date(0);
 
             // Find user's comments
-            const userComments = post.comments.filter(c => c.authorId === user.id);
-            const userCommentIds = new Set(userComments.map(c => c.id));
+            const userComments = post.comments.filter((c: any) => c.authorId === user.id);
+            const userCommentIds = new Set(userComments.map((c: any) => c.id));
 
             // Calculate new replies since last visit
-            const newReplies = post.comments.filter(c =>
+            const newReplies = post.comments.filter((c: any) =>
                 c.createdAt > lastVisitAt && c.authorId !== user.id
             );
             const newRepliesCount = newReplies.length;
 
             // Direct replies to user's comments
-            const directReplies = newReplies.filter(c =>
+            const directReplies = newReplies.filter((c: any) =>
                 c.parentId && userCommentIds.has(c.parentId)
             ).length;
 
             // Activity velocity (replies in last 30 min)
-            const recentReplies = post.comments.filter(c => c.createdAt > thirtyMinutesAgo);
+            const recentReplies = post.comments.filter((c: any) => c.createdAt > thirtyMinutesAgo);
             const activityVelocity = recentReplies.length;
 
             // Last activity
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
                 status = 'heated';
             } else if (activityVelocity >= 1 || recentReplies.length >= 1) {
                 status = 'active';
-            } else if (post.comments.filter(c => c.createdAt > twoHoursAgo).length > 0) {
+            } else if (post.comments.filter((c: any) => c.createdAt > twoHoursAgo).length > 0) {
                 status = 'active';
             }
 
@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
             } : null;
 
             // Preview of new replies (max 3)
-            const previewReplies = newReplies.slice(0, 3).map(r => ({
+            const previewReplies = newReplies.slice(0, 3).map((r: any) => ({
                 id: r.id,
                 authorUsername: r.author.username,
                 authorImage: r.author.image,
@@ -190,7 +190,7 @@ export async function GET(request: NextRequest) {
         });
 
         // Filter to only conversations with new activity
-        const activeConversations = conversations.filter(c => c.newRepliesCount > 0);
+        const activeConversations = conversations.filter((c: any) => c.newRepliesCount > 0);
 
         // Rank by: direct replies → velocity → recency
         activeConversations.sort((a, b) => {
@@ -204,7 +204,7 @@ export async function GET(request: NextRequest) {
         });
 
         // Return limited results with serialized dates
-        const result = activeConversations.slice(0, limit).map(c => ({
+        const result = activeConversations.slice(0, limit).map((c: any) => ({
             ...c,
             lastVisitAt: c.lastVisitAt.toISOString(),
             lastActivityAt: c.lastActivityAt.toISOString(),
@@ -212,7 +212,7 @@ export async function GET(request: NextRequest) {
                 ...c.userLastComment,
                 createdAt: c.userLastComment.createdAt.toISOString(),
             } : null,
-            previewReplies: c.previewReplies.map(r => ({
+            previewReplies: c.previewReplies.map((r: any) => ({
                 ...r,
                 createdAt: r.createdAt.toISOString(),
             })),
