@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         });
 
         // Get sender info for each message
-        const senderIds = [...new Set(messages.map(m => m.senderId))];
+        const senderIds = [...new Set(messages.map((m: any) => m.senderId))];
         const senders = await prisma.user.findMany({
             where: { id: { in: senderIds } },
             select: { id: true, username: true, image: true },
