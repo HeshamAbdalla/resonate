@@ -22,12 +22,9 @@ const nextConfig: NextConfig = {
   // Production-ready settings
   poweredByHeader: false, // Remove X-Powered-By header
 
-  // Ignore TypeScript and ESLint errors during build to ensure deployment
+  // Ignore TypeScript errors during build to ensure deployment
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
 
   // Security headers
