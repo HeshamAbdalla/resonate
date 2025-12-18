@@ -5,11 +5,21 @@ import { Pool } from 'pg';
 
 const connectionString = process.env.DATABASE_URL!;
 
-const pool = new Pool({ connectionString });
+// Refined pool for serverless environments
+const pool = new Pool({
+    connectionString,
+    max: 10,               // Limit total connections per function instance
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000, // 5s timeout to fail fast
+});
+
 const adapter = new PrismaPg(pool);
 
 const prismaClientSingleton = () => {
-    return new PrismaClient({ adapter });
+    return new PrismaClient({
+        adapter,
+        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    });
 };
 
 declare global {
