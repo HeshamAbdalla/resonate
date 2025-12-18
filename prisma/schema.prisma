@@ -1,0 +1,378 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                         String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username                   String               @unique
+  name                       String?
+  bio                        String?
+  image                      String?
+  bannerImage                String?
+  reputation                 Int                  @default(0)
+  onboardingCompleted        Boolean              @default(false)
+  hasPostedFirstComment      Boolean              @default(false) // For "New Voice" highlighting
+  hasReceivedFirstDisagreement Boolean            @default(false) // For FDE experience
+  createdAt                  DateTime             @default(now())
+  updatedAt                  DateTime             @updatedAt
+  comments              Comment[]
+  commentVotes          CommentVote[]
+  commentReactions      CommentReaction[]
+  createdCommunities    Community[]          @relation("CreatedCommunities")
+  modActions            ModAction[]          @relation("ModeratorActions")
+  moderatorOf           CommunityModerator[] @relation("ModeratorUser")
+  addedModerators       CommunityModerator[] @relation("AddedByUser")
+  posts                 Post[]
+  postVotes             PostVote[]
+  postReactions         PostReaction[]
+  savedPosts            SavedPost[]
+  followedPosts         FollowedPost[]
+  subscriptions         Subscription[]
+  followers             Follow[]             @relation("Following")
+  following             Follow[]             @relation("Followers")
+
+  @@map("users")
+}
+
+model Community {
+  id          String               @id @default(cuid())
+  name        String               @unique
+  slug        String               @unique
+  description String?
+  bannerImage String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  creatorId   String               @db.Uuid
+  iconImage   String?
+  rules       String?
+  creator     User                 @relation("CreatedCommunities", fields: [creatorId], references: [id])
+  modActions  ModAction[]
+  moderators  CommunityModerator[]
+  posts       Post[]
+  subscribers Subscription[]
+}
+
+model CommunityModerator {
+  id          String    @id @default(cuid())
+  communityId String
+  userId      String    @db.Uuid
+  role        String    @default("moderator") // "admin" or "moderator"
+  addedById   String    @db.Uuid
+  addedAt     DateTime  @default(now())
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation("ModeratorUser", fields: [userId], references: [id], onDelete: Cascade)
+  addedBy     User      @relation("AddedByUser", fields: [addedById], references: [id])
+
+  @@unique([communityId, userId])
+}
+
+model ModAction {
+  id          String    @id @default(cuid())
+  communityId String
+  moderatorId String    @db.Uuid
+  action      String
+  targetType  String?
+  targetId    String?
+  reason      String?
+  isPublic    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  moderator   User      @relation("ModeratorActions", fields: [moderatorId], references: [id])
+}
+
+model Subscription {
+  userId      String    @db.Uuid
+  communityId String
+  joinedAt    DateTime  @default(now())
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, communityId])
+}
+
+model Post {
+  id                  String      @id @default(cuid())
+  title               String
+  content             String?
+  type                String      @default("text")
+  url                 String?
+  upvotes             Int         @default(0)
+  downvotes           Int         @default(0)
+  score               Int         @default(0)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  authorId            String      @db.Uuid
+  communityId         String
+  commentsDisabled    Boolean     @default(false)
+  isPinned            Boolean     @default(false)
+  isLocked            Boolean     @default(false)
+  isNSFW              Boolean     @default(false)
+  isPinnedInCommunity Boolean     @default(false)
+  comments            Comment[]
+  author              User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  community           Community   @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  votes               PostVote[]
+  savedBy             SavedPost[]
+  reactions           PostReaction[]
+  followedBy          FollowedPost[]
+}
+
+model SavedPost {
+  id      String   @id @default(cuid())
+  userId  String   @db.Uuid
+  postId  String
+  savedAt DateTime @default(now())
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model Comment {
+  id        String        @id @default(cuid())
+  content       String
+  upvotes       Int           @default(0)
+  downvotes     Int           @default(0)
+  score         Int           @default(0)
+  isCreatorNote Boolean       @default(false) // Highlighted creator reply
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  authorId      String        @db.Uuid
+  postId        String
+  parentId      String?
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent        Comment?      @relation("CommentToComment", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Comment[]     @relation("CommentToComment")
+  post          Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  votes         CommentVote[]
+  reactions     CommentReaction[]
+}
+
+model PostVote {
+  id     String   @id @default(cuid())
+  userId String   @db.Uuid
+  postId String
+  type   VoteType
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model CommentVote {
+  id        String   @id @default(cuid())
+  userId    String   @db.Uuid
+  commentId String
+  type      VoteType
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
+
+model CommentReaction {
+  id        String   @id @default(cuid())
+  userId    String   @db.Uuid
+  commentId String
+  emoji     String   // The emoji used (e.g., "❤️", "😂", "👍")
+  createdAt DateTime @default(now())
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId, emoji])
+}
+
+model PostReaction {
+  id        String   @id @default(cuid())
+  userId    String   @db.Uuid
+  postId    String
+  emoji     String   // The emoji used (e.g., "❤️", "😂", "👍")
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId]) // Only ONE reaction per user per post
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   @db.Uuid  // The user who is following
+  followingId String   @db.Uuid  // The user being followed
+  createdAt   DateTime @default(now())
+  follower    User     @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+// Open Court - User reports on posts/comments
+model Report {
+  id           String    @id @default(cuid())
+  reporterId   String    @db.Uuid
+  targetType   String    // "post" or "comment"
+  targetId     String    // ID of the post or comment
+  reason       String    // Report reason category
+  description  String?   // Additional details
+  status       String    @default("pending") // "pending", "reviewed", "dismissed"
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  verdicts     Verdict[]
+
+  @@index([status])
+  @@index([targetType, targetId])
+}
+
+// Open Court - Juror verdicts on reports
+model Verdict {
+  id        String   @id @default(cuid())
+  reportId  String
+  jurorId   String   @db.Uuid
+  vote      String   // "guilty" or "innocent"
+  createdAt DateTime @default(now())
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@unique([reportId, jurorId]) // One vote per juror per report
+}
+
+// Open Court - Juror statistics
+model JurorStats {
+  id            String   @id @default(cuid())
+  userId        String   @unique @db.Uuid
+  casesReviewed Int      @default(0)
+  guiltyVotes   Int      @default(0)
+  innocentVotes Int      @default(0)
+  accuracy      Float    @default(50.0)
+  rank          String   @default("Novice Juror")
+  updatedAt     DateTime @updatedAt
+}
+
+// Chat - Messages for community chat and DMs
+model ChatMessage {
+  id             String        @id @default(cuid())
+  content        String
+  senderId       String        @db.Uuid
+  roomType       String        // "community" or "dm"
+  roomId         String        // Community slug or Conversation ID
+  createdAt      DateTime      @default(now())
+  conversationId String?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([roomType, roomId])
+  @@index([conversationId])
+}
+
+// Chat - DM Conversations
+model Conversation {
+  id           String                    @id @default(cuid())
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  messages     ChatMessage[]
+  participants ConversationParticipant[]
+
+  @@index([updatedAt])
+}
+
+// Chat - Participants in DM conversations
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String       @db.Uuid
+  joinedAt       DateTime     @default(now())
+  lastReadAt     DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+// Follow Conversation - Resume where you left off
+model FollowedPost {
+  id              String   @id @default(cuid())
+  userId          String   @db.Uuid
+  postId          String
+  lastSeenCount   Int      @default(0) // Comment count when last viewed
+  followedAt      DateTime @default(now())
+  lastViewedAt    DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post            Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+}
+
+// Chat Safety - Blocked Users
+model BlockedUser {
+  id          String   @id @default(cuid())
+  blockerId   String   @db.Uuid // The user who blocked
+  blockedId   String   @db.Uuid // The user who is blocked
+  createdAt   DateTime @default(now())
+  reason      String?  // Optional reason for blocking
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+}
+
+// Chat Safety - Message Privacy Settings
+model UserMessageSettings {
+  id               String   @id @default(cuid())
+  userId           String   @unique @db.Uuid
+  messagePrivacy   String   @default("everyone") // "everyone", "followers", "following", "mutual", "none"
+  showReadReceipts Boolean  @default(true)
+  updatedAt        DateTime @updatedAt
+}
+
+// Chat Safety - Message Reports
+model MessageReport {
+  id          String   @id @default(cuid())
+  reporterId  String   @db.Uuid
+  messageId   String
+  reason      String   // "harassment", "spam", "threats", "hate_speech", "other"
+  description String?  // Additional details
+  status      String   @default("pending") // "pending", "reviewed", "dismissed", "actioned"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([messageId])
+}
+
+// Mentions - Track @username mentions
+model Mention {
+  id            String   @id @default(cuid())
+  mentionerId   String   @db.Uuid  // User who made the mention
+  mentionedId   String   @db.Uuid  // User who was mentioned
+  sourceType    String   // "post", "comment", "message"
+  sourceId      String   // ID of the post, comment, or message
+  createdAt     DateTime @default(now())
+
+  @@unique([mentionerId, mentionedId, sourceType, sourceId])
+  @@index([mentionedId])
+  @@index([sourceType, sourceId])
+}
+
+// Notifications - All notification types
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String   @db.Uuid  // User receiving the notification
+  type        String   // "mention", "reply", "follow", "reaction", "message"
+  title       String
+  body        String?
+  sourceType  String?  // "post", "comment", "message", "user"
+  sourceId    String?  // ID of the source
+  actorId     String?  @db.Uuid  // User who triggered the notification
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+}
