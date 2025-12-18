@@ -91,7 +91,7 @@ export async function GET(
 
         // If we have subscribers, return them
         if (subscribers.length > 0) {
-            const users = subscribers.map(s => s.user);
+            const users = subscribers.map((s: any) => s.user);
             return NextResponse.json({ users });
         }
 

@@ -106,23 +106,23 @@ export async function GET(request: NextRequest) {
         });
 
         // Calculate Signal Score for each post
-        const signalPosts: SignalPost[] = posts.map(post => {
+        const signalPosts: SignalPost[] = posts.map((post: any) => {
             const hoursOld = hoursSince(post.createdAt);
             const comments = post.comments;
 
             // 1. Unique voices (distinct commenters)
-            const uniqueVoices = new Set(comments.map(c => c.authorId)).size;
+            const uniqueVoices = new Set(comments.map((c: any) => c.authorId)).size;
 
             // 2. Reply depth (nested replies indicate discussion)
-            const repliesWithParent = comments.filter(c => c.parentId !== null).length;
+            const repliesWithParent = comments.filter((c: any) => c.parentId !== null).length;
             const replyDepth = comments.length > 0 ? (repliesWithParent / comments.length) : 0;
 
             // 3. Conversation velocity - multiple time windows for "live" detection
             const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
             const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
 
-            const repliesInLast30Min = comments.filter(c => c.createdAt >= thirtyMinutesAgo).length;
-            const repliesInLast2Hours = comments.filter(c => c.createdAt >= twoHoursAgo).length;
+            const repliesInLast30Min = comments.filter((c: any) => c.createdAt >= thirtyMinutesAgo).length;
+            const repliesInLast2Hours = comments.filter((c: any) => c.createdAt >= twoHoursAgo).length;
             const conversationVelocity = repliesInLast2Hours;
 
             // 4. Last activity timestamp
@@ -135,12 +135,12 @@ export async function GET(request: NextRequest) {
 
             // 6. Creator participation
             const creatorIds = [post.community.creatorId, post.author.id];
-            const creatorReplies = comments.filter(c => creatorIds.includes(c.authorId)).length;
+            const creatorReplies = comments.filter((c: any) => creatorIds.includes(c.authorId)).length;
             const hasCreatorReply = creatorReplies > 0;
 
             // 7. Substance score (average reply length)
             const avgReplyLength = comments.length > 0
-                ? comments.reduce((sum, c) => sum + c.content.length, 0) / comments.length
+                ? comments.reduce((sum: number, c: any) => sum + c.content.length, 0) / comments.length
                 : 0;
 
             // Calculate Signal Score
@@ -192,16 +192,16 @@ export async function GET(request: NextRequest) {
             if (hasCreatorReply) signalReasons.push('Creator is participating');
             if (avgReplyLength > 100) signalReasons.push('In-depth responses');
 
-            // Get recent participants for avatar display (up to 5)
+            // Get recent participants for avatar display (up To 5)
             const seenUsers = new Set<string>();
             const recentParticipants = comments
-                .filter(c => {
+                .filter((c: any) => {
                     if (seenUsers.has(c.authorId)) return false;
                     seenUsers.add(c.authorId);
                     return true;
                 })
                 .slice(0, 5)
-                .map(c => ({
+                .map((c: any) => ({
                     id: c.author.id,
                     username: c.author.username,
                     image: c.author.image,
@@ -210,7 +210,7 @@ export async function GET(request: NextRequest) {
             // Get preview replies (2-3 conversational snippets)
             const previewReplies = comments
                 .slice(0, 3)
-                .map(c => ({
+                .map((c: any) => ({
                     author: c.author.username,
                     content: c.content.length > 80 ? c.content.slice(0, 80) + '...' : c.content,
                 }));
@@ -258,15 +258,15 @@ export async function GET(request: NextRequest) {
         if (filter === 'live') {
             // LIVE filter: Only show truly active conversations
             filteredPosts = signalPosts
-                .filter(p => p.isLive) // Must be live
+                .filter((p: any) => p.isLive) // Must be live
                 .sort((a, b) => b.liveScore - a.liveScore); // Sort by live score
         } else if (filter === 'rising') {
             filteredPosts = signalPosts
-                .filter(p => p.conversationVelocity >= 2)
+                .filter((p: any) => p.conversationVelocity >= 2)
                 .sort((a, b) => b.conversationVelocity - a.conversationVelocity);
         } else if (filter === 'deep') {
             filteredPosts = signalPosts
-                .filter(p => p.isDeepThread)
+                .filter((p: any) => p.isDeepThread)
                 .sort((a, b) => (b.uniqueVoices + b.replyDepth * 10) - (a.uniqueVoices + a.replyDepth * 10));
         }
 

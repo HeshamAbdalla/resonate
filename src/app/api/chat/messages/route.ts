@@ -30,9 +30,9 @@ export async function GET(request: NextRequest) {
             select: { id: true, username: true, image: true },
         });
 
-        const senderMap = new Map(senders.map(s => [s.id, s]));
+        const senderMap = new Map(senders.map((s: any) => [s.id, s]));
 
-        const formattedMessages = messages.map(msg => ({
+        const formattedMessages = messages.map((msg: any) => ({
             id: msg.id,
             content: msg.content,
             createdAt: msg.createdAt.toISOString(),

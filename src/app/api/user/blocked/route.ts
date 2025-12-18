@@ -18,15 +18,15 @@ export async function GET() {
         });
 
         // Get user info for blocked users
-        const blockedIds = blockedUsers.map(b => b.blockedId);
+        const blockedIds = blockedUsers.map((b: any) => b.blockedId);
         const users = await prisma.user.findMany({
             where: { id: { in: blockedIds } },
             select: { id: true, username: true, name: true, image: true },
         });
 
-        const userMap = new Map(users.map(u => [u.id, u]));
+        const userMap = new Map(users.map((u: any) => [u.id, u]));
 
-        const result = blockedUsers.map(b => ({
+        const result = blockedUsers.map((b: any) => ({
             id: b.id,
             blockedAt: b.createdAt.toISOString(),
             reason: b.reason,

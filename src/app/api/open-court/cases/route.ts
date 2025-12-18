@@ -69,7 +69,7 @@ export async function GET() {
 
         // Enrich reports with target content
         const enrichedCases = await Promise.all(
-            pendingReports.map(async (report) => {
+            pendingReports.map(async (report: any) => {
                 let content = null;
                 let context = null;
                 let aiAnalysis = { toxicityScore: 0, flaggedKeywords: [] as string[], confidence: 'Low' };
@@ -128,8 +128,8 @@ export async function GET() {
                     _count: true,
                 });
 
-                const guiltyCount = verdictCounts.find(v => v.vote === 'guilty')?._count || 0;
-                const innocentCount = verdictCounts.find(v => v.vote === 'innocent')?._count || 0;
+                const guiltyCount = verdictCounts.find((v: any) => v.vote === 'guilty')?._count || 0;
+                const innocentCount = verdictCounts.find((v: any) => v.vote === 'innocent')?._count || 0;
 
                 return {
                     id: report.id,
@@ -146,7 +146,7 @@ export async function GET() {
         );
 
         // Filter out cases where content was deleted
-        const validCases = enrichedCases.filter(c => c.content !== null);
+        const validCases = enrichedCases.filter((c: any) => c.content !== null);
 
         return NextResponse.json({ cases: validCases });
     } catch (error) {

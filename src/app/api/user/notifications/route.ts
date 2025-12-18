@@ -29,14 +29,14 @@ export async function GET() {
 
         // Calculate new replies for each
         const notifications = followedPosts
-            .map(fp => ({
+            .map((fp: any) => ({
                 postId: fp.post.id,
                 postTitle: fp.post.title,
                 communitySlug: fp.post.community.slug,
                 newReplies: fp.post._count.comments - fp.lastSeenCount,
                 followedAt: fp.followedAt.toISOString(),
             }))
-            .filter(n => n.newReplies > 0) // Only show posts with new activity
+            .filter((n: any) => n.newReplies > 0) // Only show posts with new activity
             .sort((a, b) => b.newReplies - a.newReplies);
 
         const totalNewReplies = notifications.reduce((sum, n) => sum + n.newReplies, 0);
@@ -77,7 +77,7 @@ export async function POST() {
 
         // Update each to current comment count
         await Promise.all(
-            followedPosts.map(fp =>
+            followedPosts.map((fp: any) =>
                 prisma.followedPost.update({
                     where: { id: fp.id },
                     data: {

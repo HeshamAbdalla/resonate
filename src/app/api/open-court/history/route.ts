@@ -33,7 +33,7 @@ export async function GET() {
 
         // Enrich with target content info
         const enrichedHistory = await Promise.all(
-            verdicts.map(async (verdict) => {
+            verdicts.map(async (verdict: any) => {
                 let targetInfo: { author: string; preview: string; community: string } | null = null;
 
                 if (verdict.report.targetType === 'post') {

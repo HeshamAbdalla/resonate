@@ -32,7 +32,7 @@ export async function GET() {
         });
 
         return NextResponse.json({
-            comments: comments.map(c => ({
+            comments: comments.map((c: any) => ({
                 id: c.id,
                 content: c.content,
                 score: c.score,
