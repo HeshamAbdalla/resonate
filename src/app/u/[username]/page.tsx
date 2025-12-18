@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import ProfileHeader from '@/components/Profile/ProfileHeader';
 import ProfileTabs from '@/components/Profile/ProfileTabs';

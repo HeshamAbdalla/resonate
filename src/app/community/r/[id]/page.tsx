@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import CommunityHeader from '@/components/Community/CommunityHeader';
 import CommunitySidebar from '@/components/Community/CommunitySidebar';
 import ModLogWidget from '@/components/Community/ModLogWidget';

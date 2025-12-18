@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import PostCard from '@/components/Feed/PostCard';
 import SignalFeedPreview from '@/components/Feed/SignalFeedPreview';
 import RightSidebar from '@/components/Layout/RightSidebar';
