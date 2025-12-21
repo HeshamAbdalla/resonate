@@ -3,7 +3,13 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
-const connectionString = process.env.DATABASE_URL!;
+const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
+
+if (!connectionString) {
+    if (process.env.NODE_ENV === 'production') {
+        throw new Error("DATABASE_URL or DIRECT_URL is not defined in production");
+    }
+}
 
 // Refined pool for serverless environments
 const pool = new Pool({
