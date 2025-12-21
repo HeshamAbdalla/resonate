@@ -7,6 +7,6 @@ export default defineConfig({
         path: "prisma/migrations",
     },
     datasource: {
-        url: env("DIRECT_URL"), // CLI (migrations/generate) uses the session pooler/direct host
+        url: process.env.DIRECT_URL || process.env.DATABASE_URL || "", // Fallback to DATABASE_URL if DIRECT_URL is missing
     },
 });
