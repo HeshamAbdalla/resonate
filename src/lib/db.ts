@@ -1,8 +1,12 @@
 import 'server-only';
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { PrismaNeon } from '@prisma/adapter-neon';
+import ws from 'ws';
+
+// Required for Neon serverless driver to work in Node.js environments
+neonConfig.webSocketConstructor = ws;
 
 const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
 
@@ -12,17 +16,11 @@ if (!connectionString) {
     }
 }
 
-// Refined pool for serverless environments
-const pool = new Pool({
-    connectionString,
-    max: 10,               // Limit total connections per function instance
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000, // 5s timeout to fail fast
-});
-
-const adapter = new PrismaPg(pool);
-
 const prismaClientSingleton = () => {
+    // Use the Neon serverless Pool for runtime (supports WebSockets)
+    const pool = new Pool({ connectionString });
+    const adapter = new PrismaNeon(pool as any);
+
     return new PrismaClient({
         adapter,
         log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
