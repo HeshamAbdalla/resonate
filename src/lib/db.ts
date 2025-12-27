@@ -4,7 +4,7 @@ import { Pool } from '@neondatabase/serverless';
 import { PrismaNeon } from '@prisma/adapter-neon';
 
 const prismaClientSingleton = () => {
-    const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
+    let connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
 
     if (!connectionString) {
         console.error("❌ DATABASE_URL or DIRECT_URL is missing from environment variables.");
@@ -12,6 +12,10 @@ const prismaClientSingleton = () => {
             throw new Error("DATABASE_URL or DIRECT_URL is not defined in production. Check Netlify Environment Variables.");
         }
     } else {
+        // Remove channel_binding parameter - it causes the Neon adapter to fail with "localhost" error
+        // This is a known issue with @neondatabase/serverless driver's connection string parser
+        connectionString = connectionString.replace(/[?&]channel_binding=require/g, '');
+
         const maskedUrl = connectionString.replace(/\/\/.*:.*@/, "//***:***@");
         console.log(`📡 Prisma initialized with: ${maskedUrl}`);
     }
