@@ -1,23 +1,23 @@
 import 'server-only';
-import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
-import { Pool, neonConfig } from '@neondatabase/serverless';
+import { Pool } from '@neondatabase/serverless';
 import { PrismaNeon } from '@prisma/adapter-neon';
-import ws from 'ws';
-
-// Required for Neon serverless driver to work in Node.js environments
-neonConfig.webSocketConstructor = ws;
-
-const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
-
-if (!connectionString) {
-    if (process.env.NODE_ENV === 'production') {
-        throw new Error("DATABASE_URL or DIRECT_URL is not defined in production");
-    }
-}
 
 const prismaClientSingleton = () => {
-    // Use the Neon serverless Pool for runtime (supports WebSockets)
+    const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
+
+    if (!connectionString) {
+        console.error("❌ DATABASE_URL or DIRECT_URL is missing from environment variables.");
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error("DATABASE_URL or DIRECT_URL is not defined in production. Check Netlify Environment Variables.");
+        }
+    } else {
+        const maskedUrl = connectionString.replace(/\/\/.*:.*@/, "//***:***@");
+        console.log(`📡 Prisma initialized with: ${maskedUrl}`);
+    }
+
+    // Use the Neon serverless Pool for runtime
+    // Note: Node.js 20+ has global WebSocket support
     const pool = new Pool({ connectionString });
     const adapter = new PrismaNeon(pool as any);
 
