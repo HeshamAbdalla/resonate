@@ -16,6 +16,10 @@ const prismaClientSingleton = () => {
         // This is a known issue with @neondatabase/serverless driver's connection string parser
         connectionString = connectionString.replace(/[?&]channel_binding=require/g, '');
 
+        // Remove -pooler from hostname - the Neon serverless driver has its own pooling over WebSockets
+        // Using Neon's pooler endpoint conflicts with the driver's connection mechanism
+        connectionString = connectionString.replace(/-pooler\.([^/]+)\.neon\.tech/g, '.$1.neon.tech');
+
         const maskedUrl = connectionString.replace(/\/\/.*:.*@/, "//***:***@");
         console.log(`📡 Prisma initialized with: ${maskedUrl}`);
     }
