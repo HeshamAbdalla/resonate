@@ -1,7 +1,7 @@
 import 'server-only';
 import { PrismaClient } from '@prisma/client';
-import { Pool } from '@neondatabase/serverless';
-import { PrismaNeon } from '@prisma/adapter-neon';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const prismaClientSingleton = () => {
     let connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL || process.env.NETLIFY_DATABASE_URL;
@@ -12,29 +12,26 @@ const prismaClientSingleton = () => {
             throw new Error("DATABASE_URL, DIRECT_URL, or NETLIFY_DATABASE_URL is not defined in production. Check Netlify Environment Variables.");
         }
     } else {
-        // Remove channel_binding parameter - it causes the Neon adapter to fail with "localhost" error
-        // This is a known issue with @neondatabase/serverless driver's connection string parser
-        connectionString = connectionString.replace(/[?&]channel_binding=require/g, '');
-
-        // Remove -pooler from hostname - the Neon serverless driver has its own pooling over WebSockets
-        // Using Neon's pooler endpoint conflicts with the driver's connection mechanism
-        connectionString = connectionString.replace(/-pooler\.([^/]+)\.neon\.tech/g, '.$1.neon.tech');
-
-        // Remove sslmode parameter - Neon serverless driver uses WSS (already encrypted)
-        // Adding sslmode=require causes double-encryption conflict
-        connectionString = connectionString.replace(/[?&]sslmode=require/g, '');
-
-        // Clean up any trailing ? or & from parameter removal
-        connectionString = connectionString.replace(/\?&/g, '?').replace(/[?&]$/g, '');
+        // Remove problematic Neon-specific parameters
+        connectionString = connectionString
+            .replace(/[?&]channel_binding=require/g, '')
+            .replace(/-pooler\.([^/]+)\.neon\.tech/g, '.$1.neon.tech')
+            .replace(/\?&/g, '?')
+            .replace(/[?&]$/g, '');
 
         const maskedUrl = connectionString.replace(/\/\/.*:.*@/, "//***:***@");
         console.log(`📡 Prisma initialized with: ${maskedUrl}`);
     }
 
-    // Use the Neon serverless Pool for runtime
-    // Note: Node.js 20+ has global WebSocket support
-    const pool = new Pool({ connectionString });
-    const adapter = new PrismaNeon(pool as any);
+    // Use standard pg adapter with connection pooling for serverless
+    const pool = new Pool({
+        connectionString,
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
+    });
+
+    const adapter = new PrismaPg(pool);
 
     return new PrismaClient({
         adapter,
