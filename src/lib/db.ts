@@ -20,6 +20,13 @@ const prismaClientSingleton = () => {
         // Using Neon's pooler endpoint conflicts with the driver's connection mechanism
         connectionString = connectionString.replace(/-pooler\.([^/]+)\.neon\.tech/g, '.$1.neon.tech');
 
+        // Remove sslmode parameter - Neon serverless driver uses WSS (already encrypted)
+        // Adding sslmode=require causes double-encryption conflict
+        connectionString = connectionString.replace(/[?&]sslmode=require/g, '');
+
+        // Clean up any trailing ? or & from parameter removal
+        connectionString = connectionString.replace(/\?&/g, '?').replace(/[?&]$/g, '');
+
         const maskedUrl = connectionString.replace(/\/\/.*:.*@/, "//***:***@");
         console.log(`📡 Prisma initialized with: ${maskedUrl}`);
     }
