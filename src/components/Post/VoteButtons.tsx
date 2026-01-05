@@ -92,9 +92,9 @@ export default function VoteButtons({ postId, initialScore, vertical = true, siz
     };
 
     const sizeClasses = {
-        sm: { icon: 'w-4 h-4', text: 'text-sm', btn: 'btn-xs' },
-        md: { icon: 'w-5 h-5', text: 'text-base', btn: 'btn-sm' },
-        lg: { icon: 'w-6 h-6', text: 'text-lg', btn: 'btn-md' },
+        sm: { icon: 'w-4 h-4', text: 'text-sm', btn: 'btn-sm min-h-[44px] min-w-[44px]' },
+        md: { icon: 'w-5 h-5', text: 'text-base', btn: 'btn-sm min-h-[44px] min-w-[44px]' },
+        lg: { icon: 'w-6 h-6', text: 'text-lg', btn: 'btn-md min-h-[48px] min-w-[48px]' },
     };
 
     const formatScore = (score: number) => {

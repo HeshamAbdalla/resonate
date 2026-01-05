@@ -49,6 +49,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&display=swap" rel="stylesheet" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
       </head>
       <body className="bg-base-200 min-h-screen">
         <MessagePanelProvider>
@@ -60,8 +61,8 @@ export default function RootLayout({
               <Sidebar />
             </MobileDrawer>
 
-            {/* Main Layout Shell */}
-            <div className="pt-20 min-h-screen max-w-[1920px] mx-auto">
+            {/* Main Layout Shell - Improved mobile spacing */}
+            <div className="pt-[calc(var(--navbar-height-mobile)+var(--safe-area-top))] md:pt-20 min-h-screen max-w-[1920px] mx-auto pb-safe-bottom">
               <div className="lg:grid lg:grid-cols-[320px_1fr]">
 
                 {/* Sidebar Column (Hidden on Mobile, Fixed on Desktop) */}
@@ -72,8 +73,8 @@ export default function RootLayout({
                 {/* Sidebar Placeholder for Grid Flow */}
                 <div className="hidden lg:block w-[320px]"></div>
 
-                {/* Main Content Area */}
-                <main className="px-4 pb-20 w-full">
+                {/* Main Content Area - Improved mobile padding */}
+                <main className="px-3 sm:px-4 pb-20 w-full">
                   <div className="w-full max-w-7xl mx-auto flex justify-center">
                     {children}
                   </div>

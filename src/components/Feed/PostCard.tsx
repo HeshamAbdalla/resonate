@@ -217,17 +217,18 @@ export default function PostCard({
         >
             <div className="card-body p-0 flex-row">
 
-                {/* Vote Column - Desktop */}
+                {/* Vote Column - Desktop - Improved touch targets */}
                 <div className="hidden sm:flex flex-col items-center gap-0.5 p-3 bg-base-200/30 rounded-l-2xl min-w-[3rem]">
                     <motion.button
                         onClick={() => handleVote('UP')}
                         disabled={voting}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`btn btn-ghost btn-xs btn-circle ${currentVote === 'UP'
+                        className={`btn btn-ghost btn-xs btn-circle min-h-[44px] min-w-[44px] touch-active ${currentVote === 'UP'
                             ? 'text-success bg-success/10'
                             : 'hover:text-success hover:bg-success/10'
                             }`}
+                        aria-label="Upvote"
                     >
                         <ArrowUp className={`w-5 h-5 ${currentVote === 'UP' ? 'fill-current' : ''}`} />
                     </motion.button>
@@ -248,10 +249,11 @@ export default function PostCard({
                         disabled={voting}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        className={`btn btn-ghost btn-xs btn-circle ${currentVote === 'DOWN'
+                        className={`btn btn-ghost btn-xs btn-circle min-h-[44px] min-w-[44px] touch-active ${currentVote === 'DOWN'
                             ? 'text-error bg-error/10'
                             : 'hover:text-error hover:bg-error/10'
                             }`}
+                        aria-label="Downvote"
                     >
                         <ArrowDown className={`w-5 h-5 ${currentVote === 'DOWN' ? 'fill-current' : ''}`} />
                     </motion.button>
@@ -354,11 +356,12 @@ export default function PostCard({
 
                     {/* Actions Row */}
                     <div className="flex items-center gap-1 flex-wrap">
-                        {/* Mobile Vote */}
+                        {/* Mobile Vote - Improved touch targets */}
                         <div className="flex sm:hidden items-center gap-1 mr-2">
                             <button
                                 onClick={() => handleVote('UP')}
-                                className={`btn btn-ghost btn-xs btn-circle ${currentVote === 'UP' ? 'text-success' : ''}`}
+                                className={`btn btn-ghost btn-xs btn-circle min-h-[44px] min-w-[44px] touch-active ${currentVote === 'UP' ? 'text-success' : ''}`}
+                                aria-label="Upvote"
                             >
                                 <ArrowUp className="w-4 h-4" />
                             </button>
@@ -369,7 +372,8 @@ export default function PostCard({
                             </span>
                             <button
                                 onClick={() => handleVote('DOWN')}
-                                className={`btn btn-ghost btn-xs btn-circle ${currentVote === 'DOWN' ? 'text-error' : ''}`}
+                                className={`btn btn-ghost btn-xs btn-circle min-h-[44px] min-w-[44px] touch-active ${currentVote === 'DOWN' ? 'text-error' : ''}`}
+                                aria-label="Downvote"
                             >
                                 <ArrowDown className="w-4 h-4" />
                             </button>
@@ -425,8 +429,9 @@ export default function PostCard({
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="flex items-center justify-center h-8 px-2 rounded-lg hover:bg-base-content/10 transition-colors"
+                                className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg hover:bg-base-content/10 transition-colors touch-active"
                                 onClick={() => setShowReactions(!showReactions)}
+                                aria-label="Add reaction"
                             >
                                 <span className="text-base">{userReaction ? '✨' : '😀'}</span>
                             </motion.button>

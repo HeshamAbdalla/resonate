@@ -78,7 +78,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="navbar bg-base-100/80 backdrop-blur-md fixed top-0 z-50 border-b border-base-content/10 px-2 sm:px-4 min-h-14">
+      <div className="navbar bg-base-100/80 backdrop-blur-md fixed top-0 z-50 border-b border-base-content/10 px-2 sm:px-4 min-h-[64px] md:min-h-[72px]" style={{ paddingTop: 'var(--safe-area-top)' }}>
 
         {/* Start: Mobile Drawer Toggle & Logo */}
         <div className="navbar-start gap-1 sm:gap-4">
@@ -111,18 +111,19 @@ export default function Navbar() {
         {/* End: Actions & Profile */}
         <div className="navbar-end gap-0.5 sm:gap-1 lg:gap-2">
 
-          {/* Mobile Search Button */}
+          {/* Mobile Search Button - Improved touch target */}
           <button
-            className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-base-content/10 transition-colors md:hidden"
+            className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-full hover:bg-base-content/10 transition-colors md:hidden touch-active"
             onClick={() => setShowMobileSearch(!showMobileSearch)}
+            aria-label="Search"
           >
             <Search className="h-5 w-5 opacity-70" />
           </button>
 
-          {/* 🔴 Live Indicator - Hidden on mobile, icon-only on tablet */}
+          {/* 🔴 Live Indicator - Hidden on mobile, improved touch target on tablet */}
           <Link
             href="/signal?filter=live"
-            className="hidden sm:flex items-center gap-1 h-9 px-2 lg:px-3 rounded-full hover:bg-error/10 transition-colors"
+            className="hidden sm:flex items-center gap-1 min-h-[44px] px-2 lg:px-3 rounded-full hover:bg-error/10 transition-colors touch-active"
             title="Live conversations"
           >
             <span className="relative flex h-2 w-2">
@@ -135,7 +136,7 @@ export default function Navbar() {
           {/* Resume - Shows count badge when conversations are waiting */}
           <Link
             href="/signal?filter=live"
-            className={`hidden sm:flex items-center gap-1 h-9 px-2 lg:px-3 rounded-full transition-colors ${resumeCount > 0 ? 'text-cyan-500 hover:bg-cyan-500/10' : 'hover:bg-base-content/10'}`}
+            className={`hidden sm:flex items-center gap-1 min-h-[44px] px-2 lg:px-3 rounded-full transition-colors touch-active ${resumeCount > 0 ? 'text-cyan-500 hover:bg-cyan-500/10' : 'hover:bg-base-content/10'}`}
             title="Resume conversations"
           >
             <RotateCcw className="h-4 w-4" />
@@ -149,9 +150,9 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* Start a Conversation - Compact on mobile */}
+          {/* Start a Conversation - Improved mobile touch target */}
           <details className="dropdown dropdown-end">
-            <summary className="btn btn-sm btn-primary gap-1 sm:gap-2 rounded-full font-normal list-none m-0 px-2 sm:px-3">
+            <summary className="btn btn-sm btn-primary gap-1 sm:gap-2 rounded-full font-normal list-none m-0 px-2 sm:px-3 min-h-[44px] touch-active">
               <Plus className="h-4 w-4" />
               <span className="hidden lg:inline">Start a Conversation</span>
               <span className="hidden sm:inline lg:hidden">New</span>
@@ -193,10 +194,10 @@ export default function Navbar() {
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          {/* Profile Dropdown */}
+          {/* Profile Dropdown - Improved touch target */}
           <details className="dropdown dropdown-end ml-1 group">
-            <summary role="button" className="flex items-center justify-center w-9 h-9 rounded-full cursor-pointer hover:bg-base-content/10 transition-colors list-none">
-              <div className="w-8 sm:w-9 rounded-full ring-2 ring-base-100 overflow-hidden">
+            <summary role="button" className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-full cursor-pointer hover:bg-base-content/10 transition-colors list-none touch-active">
+              <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-full ring-2 ring-base-100 overflow-hidden">
                 {user?.image ? (
                   <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
                 ) : (
