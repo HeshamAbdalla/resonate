@@ -29,6 +29,10 @@ const prismaClientSingleton = () => {
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 10000,
+        // Explicitly enable SSL for Neon
+        ssl: connectionString?.includes('neon.tech') ? {
+            rejectUnauthorized: false
+        } : false
     });
 
     const adapter = new PrismaPg(pool);

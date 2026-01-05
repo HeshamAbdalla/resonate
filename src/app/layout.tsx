@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/Layout/Navbar';
 import Sidebar from '@/components/Layout/Sidebar';
+import BottomNav from '@/components/Layout/BottomNav';
 import FlyonuiScript from '@/components/FlyonuiScript';
 import IntersectObserver from '@/components/IntersectObserver';
 import MobileDrawer, { DrawerProvider } from '@/components/Layout/MobileDrawer';
@@ -74,7 +75,7 @@ export default function RootLayout({
                 <div className="hidden lg:block w-[320px]"></div>
 
                 {/* Main Content Area - Improved mobile padding */}
-                <main className="px-3 sm:px-4 pb-20 w-full">
+                <main className="px-3 sm:px-4 pb-24 lg:pb-20 w-full">
                   <div className="w-full max-w-7xl mx-auto flex justify-center">
                     {children}
                   </div>
@@ -82,6 +83,9 @@ export default function RootLayout({
 
               </div>
             </div>
+
+            {/* Bottom Navigation - Mobile Only */}
+            <BottomNav />
 
             {/* Message Side Panel */}
             <MessageSidePanel />

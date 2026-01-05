@@ -17,6 +17,14 @@
   --color-accent: var(--accent);
 }
 
+/* Base typography for mobile readability */
+html {
+  font-size: 16px;
+  /* Prevent mobile browser zoom on input focus */
+  line-height: 1.6;
+  /* Improved readability on mobile */
+}
+
 /* Custom scrollbar for dark mode */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
