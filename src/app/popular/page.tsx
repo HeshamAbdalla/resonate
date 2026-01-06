@@ -126,25 +126,30 @@ export default function PopularPage() {
                     </div>
                 </div>
 
-                {/* Vibe Check Filter (Horizontal Scroll) */}
-                <div className="mb-8 overflow-x-auto pb-2 custom-scrollbar">
-                    <div className="flex gap-2">
-                        <div className="flex items-center px-4 md:hidden">
-                            <Filter className="w-4 h-4 text-base-content/50" />
+                {/* Vibe Check Filter (Horizontal Scroll) - Fixed with scroll indicators */}
+                <div className="mb-8 -mx-3 sm:mx-0">
+                    <div
+                        className="overflow-x-auto pb-2 custom-scrollbar px-3 sm:px-0"
+                        style={{
+                            WebkitMaskImage: 'linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent)',
+                            maskImage: 'linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent)'
+                        }}
+                    >
+                        <div className="flex gap-2 min-w-max">
+                            {vibes.map((v) => (
+                                <button
+                                    key={v.id}
+                                    onClick={() => setActiveVibe(v.id)}
+                                    className={`btn btn-sm rounded-full gap-2 transition-all duration-300 ${activeVibe === v.id
+                                        ? 'btn-primary shadow-md scale-105'
+                                        : 'btn-ghost bg-base-200/50 text-base-content/70 hover:bg-base-200'
+                                        }`}
+                                >
+                                    <v.icon className={`w-4 h-4 ${activeVibe === v.id ? 'text-primary-content' : v.color}`} />
+                                    {v.label}
+                                </button>
+                            ))}
                         </div>
-                        {vibes.map((v) => (
-                            <button
-                                key={v.id}
-                                onClick={() => setActiveVibe(v.id)}
-                                className={`btn btn-sm rounded-full gap-2 transition-all duration-300 ${activeVibe === v.id
-                                    ? 'btn-primary shadow-md scale-105'
-                                    : 'btn-ghost bg-base-200/50 text-base-content/70 hover:bg-base-200'
-                                    }`}
-                            >
-                                <v.icon className={`w-4 h-4 ${activeVibe === v.id ? 'text-primary-content' : v.color}`} />
-                                {v.label}
-                            </button>
-                        ))}
                     </div>
                 </div>
 
