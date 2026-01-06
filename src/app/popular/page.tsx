@@ -91,7 +91,7 @@ export default function PopularPage() {
     ];
 
     return (
-        <div className="flex gap-8 justify-center items-start pt-6">
+        <div className="flex gap-8 justify-center items-start pt-6 overflow-x-hidden">
 
             <div className="w-full max-w-3xl">
 
