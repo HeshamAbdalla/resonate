@@ -95,30 +95,34 @@ export default function PopularPage() {
 
             <div className="w-full max-w-3xl">
 
-                {/* Header & Controls */}
-                <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4">
+                {/* Header & Controls - Improved mobile layout */}
+                <div className="flex flex-col gap-4 mb-8">
                     <div>
                         <h1 className="text-3xl font-black flex items-center gap-2 mb-1">
                             <Globe className="w-8 h-8 text-primary motion-spin-in-[180deg] motion-duration-700" />
                             Popular Now
                         </h1>
-                        <p className="text-base-content/60 text-sm">Curated content from across the Resonate network.</p>
+                        <p className="text-base-content/60 text-sm max-w-full">
+                            Curated content from across the Resonate network.
+                        </p>
                     </div>
 
-                    {/* Scope Toggle */}
-                    <div className="join bg-base-200 p-1 rounded-lg">
-                        <button
-                            onClick={() => setScope('Global')}
-                            className={`btn btn-sm join-item border-none ${scope === 'Global' ? 'btn-active bg-base-100 shadow-sm' : 'btn-ghost'}`}
-                        >
-                            <Globe className="w-4 h-4" /> Global
-                        </button>
-                        <button
-                            onClick={() => setScope('Local')}
-                            className={`btn btn-sm join-item border-none ${scope === 'Local' ? 'btn-active bg-base-100 shadow-sm' : 'btn-ghost'}`}
-                        >
-                            <MapPin className="w-4 h-4" /> Near Me
-                        </button>
+                    {/* Scope Toggle - Centered on mobile, right-aligned on desktop */}
+                    <div className="self-center md:self-end">
+                        <div className="join bg-base-200 p-1 rounded-lg">
+                            <button
+                                onClick={() => setScope('Global')}
+                                className={`btn btn-sm join-item border-none min-h-[44px] touch-active ${scope === 'Global' ? 'btn-active bg-base-100 shadow-sm' : 'btn-ghost'}`}
+                            >
+                                <Globe className="w-4 h-4" /> Global
+                            </button>
+                            <button
+                                onClick={() => setScope('Local')}
+                                className={`btn btn-sm join-item border-none min-h-[44px] touch-active ${scope === 'Local' ? 'btn-active bg-base-100 shadow-sm' : 'btn-ghost'}`}
+                            >
+                                <MapPin className="w-4 h-4" /> Near Me
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -146,7 +150,7 @@ export default function PopularPage() {
 
                 {/* Hidden Gems Carousel */}
                 <div className="mb-10">
-                    <div className="flex items-center gap-2 mb-3 px-1">
+                    <div className="flex items-center gap-2 mb-3">
                         <Gem className="w-4 h-4 text-secondary" />
                         <h3 className="text-sm font-bold uppercase tracking-wider text-base-content/60">Hidden Gems • Small Communities</h3>
                     </div>
@@ -191,9 +195,12 @@ export default function PopularPage() {
                             </div>
                         ))
                     ) : (
-                        <div className="text-center py-20 opacity-50">
-                            <Coffee className="w-12 h-12 mx-auto mb-4" />
-                            <p>No posts found for this vibe just yet.</p>
+                        <div className="text-center py-32">
+                            <Coffee className="w-16 h-16 mx-auto mb-6 text-base-content/30" />
+                            <h3 className="text-xl font-bold mb-2 text-base-content/70">
+                                No {activeVibe === 'All' ? 'posts' : activeVibe.toLowerCase() + ' posts'} yet
+                            </h3>
+                            <p className="text-sm text-base-content/50">Check back soon or try a different vibe filter!</p>
                         </div>
                     )}
                 </div>

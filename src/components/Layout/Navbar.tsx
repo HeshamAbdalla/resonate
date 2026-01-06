@@ -108,8 +108,8 @@ export default function Navbar() {
           </label>
         </div>
 
-        {/* End: Actions & Profile */}
-        <div className="navbar-end gap-0.5 sm:gap-1 lg:gap-2">
+        {/* End: Actions & Profile - Improved spacing */}
+        <div className="navbar-end gap-1 sm:gap-2 lg:gap-3">
 
           {/* Mobile Search Button - Improved touch target */}
           <button
@@ -150,12 +150,12 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* Start a Conversation - Improved mobile touch target */}
-          <details className="dropdown dropdown-end">
+          {/* Start a Conversation - Hidden on mobile (use bottom nav instead) */}
+          <details className="dropdown dropdown-end hidden sm:block">
             <summary className="btn btn-sm btn-primary gap-1 sm:gap-2 rounded-full font-normal list-none m-0 px-2 sm:px-3 min-h-[44px] touch-active">
               <Plus className="h-4 w-4" />
               <span className="hidden lg:inline">Start a Conversation</span>
-              <span className="hidden sm:inline lg:hidden">New</span>
+              <span className="sm:inline lg:hidden">New</span>
             </summary>
             <ul className="absolute right-0 top-full mt-2 z-[1] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100/90 backdrop-blur-xl rounded-box w-56 border border-white/10">
               <li>
@@ -191,8 +191,10 @@ export default function Navbar() {
           {/* Notifications */}
           <ConversationNotifications />
 
-          {/* Theme Toggle */}
-          <ThemeToggle />
+          {/* Theme Toggle - Hidden on small mobile */}
+          <div className="hidden sm:flex">
+            <ThemeToggle />
+          </div>
 
           {/* Profile Dropdown - Improved touch target */}
           <details className="dropdown dropdown-end ml-1 group">
