@@ -150,97 +150,127 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* Start a Conversation - Hidden on mobile (use bottom nav instead) */}
-          <details className="dropdown dropdown-end hidden sm:block">
-            <summary className="btn btn-sm btn-primary gap-1 sm:gap-2 rounded-full font-normal list-none m-0 px-2 sm:px-3 min-h-[44px] touch-active">
-              <Plus className="h-4 w-4" />
-              <span className="hidden lg:inline">Start a Conversation</span>
-              <span className="sm:inline lg:hidden">New</span>
-            </summary>
-            <ul className="absolute right-0 top-full mt-1 z-[60] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100/90 backdrop-blur-xl rounded-box w-[calc(100vw-2rem)] max-w-xs md:w-56 border border-white/10">
-              <li>
-                <Link href="/submit" className="gap-3">
-                  <MessageCircle className="w-4 h-4" />
-                  Start a conversation
-                </Link>
-              </li>
-              <li>
-                <Link href="/submit?type=question" className="gap-3">
-                  <HelpCircle className="w-4 h-4" />
-                  Ask a question
-                </Link>
-              </li>
-              <li>
-                <Link href="/submit?type=perspective" className="gap-3">
-                  <MessageSquareText className="w-4 h-4" />
-                  Share a perspective
-                </Link>
-              </li>
-              <li className="border-t border-base-content/5 mt-1 pt-1">
-                <Link href="/create-community" className="gap-3">
-                  <Users className="w-4 h-4" />
-                  Create Community
-                </Link>
-              </li>
-            </ul>
-          </details>
+          {/* Auth-dependent actions */}
+          {user ? (
+            <>
+              {/* Start a Conversation - Hidden on mobile (use bottom nav instead) */}
+              <details className="dropdown dropdown-end hidden sm:block">
+                <summary className="btn btn-sm btn-primary gap-1 sm:gap-2 rounded-full font-normal list-none m-0 px-2 sm:px-3 min-h-[44px] touch-active">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden lg:inline">Start a Conversation</span>
+                  <span className="sm:inline lg:hidden">New</span>
+                </summary>
+                <ul className="absolute right-0 top-full mt-1 z-[60] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100/90 backdrop-blur-xl rounded-box w-[calc(100vw-2rem)] max-w-xs md:w-56 border border-white/10">
+                  <li>
+                    <Link href="/submit" className="gap-3">
+                      <MessageCircle className="w-4 h-4" />
+                      Start a conversation
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/submit?type=question" className="gap-3">
+                      <HelpCircle className="w-4 h-4" />
+                      Ask a question
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/submit?type=perspective" className="gap-3">
+                      <MessageSquareText className="w-4 h-4" />
+                      Share a perspective
+                    </Link>
+                  </li>
+                  <li className="border-t border-base-content/5 mt-1 pt-1">
+                    <Link href="/create-community" className="gap-3">
+                      <Users className="w-4 h-4" />
+                      Create Community
+                    </Link>
+                  </li>
+                </ul>
+              </details>
 
-          {/* Messages Dropdown */}
-          <NavbarMessageDropdown />
+              {/* Messages Dropdown */}
+              <NavbarMessageDropdown />
 
-          {/* Notifications */}
-          <ConversationNotifications />
+              {/* Notifications */}
+              <ConversationNotifications />
 
-          {/* Theme Toggle - Hidden on small mobile */}
-          <div className="hidden sm:flex">
-            <ThemeToggle />
-          </div>
-
-          {/* Profile Dropdown - Improved touch target */}
-          <details className="dropdown dropdown-end ml-1 group">
-            <summary role="button" className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-full cursor-pointer hover:bg-base-content/10 transition-colors list-none touch-active">
-              <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-full ring-2 ring-base-100 overflow-hidden">
-                {user?.image ? (
-                  <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="bg-gradient-to-tr from-accent to-primary text-primary-content w-full h-full flex items-center justify-center">
-                    <span className="text-xs font-bold">{user?.username?.[0]?.toUpperCase() || 'U'}</span>
-                  </div>
-                )}
+              {/* Theme Toggle - Hidden on small mobile */}
+              <div className="hidden sm:flex">
+                <ThemeToggle />
               </div>
-            </summary>
-            <ul className="absolute right-0 top-full mt-2 z-[1] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100/90 backdrop-blur-xl rounded-box w-56 border border-white/10 motion-scale-in-[0.95] motion-opacity-in-[0%] motion-blur-in-[5px] motion-duration-200 origin-top-right">
-              <li className="menu-title px-4 py-2 text-xs border-b border-base-content/5 mb-1 opacity-70">
-                <span>Signed in as <b className="text-base-content font-bold">{user?.username || 'User'}</b></span>
-              </li>
 
-              {/* Conversation-focused options */}
-              <li>
-                <Link href="/profile?tab=comments" className="gap-3">
-                  <MessageCircle className="w-4 h-4" />
-                  Your Conversations
-                </Link>
-              </li>
-              <li>
-                <Link href="/profile?tab=followed" className="gap-3">
-                  <Bookmark className="w-4 h-4" />
-                  Followed Threads
-                </Link>
-              </li>
-              <li>
-                <Link href="/profile?tab=communities" className="gap-3">
-                  <Users className="w-4 h-4" />
-                  Your Communities
-                </Link>
-              </li>
+              {/* Profile Dropdown - Improved touch target */}
+              <details className="dropdown dropdown-end ml-1 group">
+                <summary role="button" className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-full cursor-pointer hover:bg-base-content/10 transition-colors list-none touch-active">
+                  <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-full ring-2 ring-base-100 overflow-hidden">
+                    {user?.image ? (
+                      <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="bg-gradient-to-tr from-accent to-primary text-primary-content w-full h-full flex items-center justify-center">
+                        <span className="text-xs font-bold">{user?.username?.[0]?.toUpperCase() || 'U'}</span>
+                      </div>
+                    )}
+                  </div>
+                </summary>
+                <ul className="absolute right-0 top-full mt-2 z-[1] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100/90 backdrop-blur-xl rounded-box w-56 border border-white/10 motion-scale-in-[0.95] motion-opacity-in-[0%] motion-blur-in-[5px] motion-duration-200 origin-top-right">
+                  <li className="menu-title px-4 py-2 text-xs border-b border-base-content/5 mb-1 opacity-70">
+                    <span>Signed in as <b className="text-base-content font-bold">{user?.username || 'User'}</b></span>
+                  </li>
 
-              <li className="border-t border-base-content/5 mt-1 pt-1">
-                <Link href="/profile">Profile</Link>
-              </li>
-              <li><Link href="/settings">Settings</Link></li>
-              <li><a className="text-error">Logout</a></li>
-            </ul>
-          </details>
+                  {/* Conversation-focused options */}
+                  <li>
+                    <Link href="/profile?tab=comments" className="gap-3">
+                      <MessageCircle className="w-4 h-4" />
+                      Your Conversations
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/profile?tab=followed" className="gap-3">
+                      <Bookmark className="w-4 h-4" />
+                      Followed Threads
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/profile?tab=communities" className="gap-3">
+                      <Users className="w-4 h-4" />
+                      Your Communities
+                    </Link>
+                  </li>
+
+                  <li className="border-t border-base-content/5 mt-1 pt-1">
+                    <Link href="/profile">Profile</Link>
+                  </li>
+                  <li><Link href="/settings">Settings</Link></li>
+                  <li>
+                    <form action="/api/auth/logout" method="POST">
+                      <button type="submit" className="text-error w-full text-left">Logout</button>
+                    </form>
+                  </li>
+                </ul>
+              </details>
+            </>
+          ) : (
+            <>
+              {/* Theme Toggle for guests */}
+              <div className="hidden sm:flex">
+                <ThemeToggle />
+              </div>
+
+              {/* Sign In / Register buttons for unauthenticated users */}
+              <Link
+                href="/login"
+                className="btn btn-sm btn-ghost gap-2 rounded-full min-h-[44px] touch-active"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className="btn btn-sm btn-primary gap-2 rounded-full min-h-[44px] touch-active hidden sm:inline-flex"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
