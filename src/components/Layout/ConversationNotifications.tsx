@@ -105,12 +105,12 @@ export default function ConversationNotifications() {
                             initial={{ opacity: 0, y: -10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                            className="absolute right-0 mt-2 w-80 bg-base-100 border border-base-content/10 rounded-lg shadow-xl z-50"
+                            className="absolute right-0 mt-1 w-[calc(100vw-2rem)] max-w-sm md:w-80 bg-base-100 border border-base-content/10 rounded-lg shadow-xl z-[60]"
                         >
                             {/* Header */}
                             <div className="flex items-center justify-between p-3 border-b border-base-content/10">
                                 <div className="flex items-center gap-2">
-                                    <h3 className="font-bold text-sm">Conversations</h3>
+                                    <h3 className="font-bold text-sm">Notifications</h3>
                                     {/* Connection status */}
                                     <span className={`badge badge-xs gap-1 ${isConnected ? 'badge-success' : 'badge-ghost'}`}>
                                         {isConnected ? <Wifi className="w-2 h-2" /> : <WifiOff className="w-2 h-2" />}

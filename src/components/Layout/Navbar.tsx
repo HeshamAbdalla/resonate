@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Plus, Users, RotateCcw, MessageCircle, Bookmark } from 'lucide-react';
+import { Search, Plus, Users, RotateCcw, MessageCircle, Bookmark, HelpCircle, MessageSquareText } from 'lucide-react';
 import Link from 'next/link';
 import ConversationNotifications from './ConversationNotifications';
 import { DrawerToggle } from './MobileDrawer';
@@ -157,7 +157,7 @@ export default function Navbar() {
               <span className="hidden lg:inline">Start a Conversation</span>
               <span className="sm:inline lg:hidden">New</span>
             </summary>
-            <ul className="absolute right-0 top-full mt-2 z-[1] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100/90 backdrop-blur-xl rounded-box w-56 border border-white/10">
+            <ul className="absolute right-0 top-full mt-1 z-[60] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100/90 backdrop-blur-xl rounded-box w-[calc(100vw-2rem)] max-w-xs md:w-56 border border-white/10">
               <li>
                 <Link href="/submit" className="gap-3">
                   <MessageCircle className="w-4 h-4" />
@@ -166,13 +166,13 @@ export default function Navbar() {
               </li>
               <li>
                 <Link href="/submit?type=question" className="gap-3">
-                  <span className="text-lg">❓</span>
+                  <HelpCircle className="w-4 h-4" />
                   Ask a question
                 </Link>
               </li>
               <li>
                 <Link href="/submit?type=perspective" className="gap-3">
-                  <span className="text-lg">💭</span>
+                  <MessageSquareText className="w-4 h-4" />
                   Share a perspective
                 </Link>
               </li>
