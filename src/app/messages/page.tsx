@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MessageCircle, Loader2, Search, PenSquare } from 'lucide-react';
 
@@ -20,11 +21,41 @@ interface Conversation {
 }
 
 export default function MessagesPage() {
+    const router = useRouter();
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
 
+    // Check authentication first
     useEffect(() => {
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.user) {
+                        setIsAuthenticated(true);
+                    } else {
+                        // Not authenticated, redirect to login
+                        router.push('/login?returnTo=%2Fmessages');
+                    }
+                } else {
+                    // Not authenticated, redirect to login
+                    router.push('/login?returnTo=%2Fmessages');
+                }
+            } catch (error) {
+                console.error('Failed to check auth:', error);
+                router.push('/login?returnTo=%2Fmessages');
+            }
+        }
+        checkAuth();
+    }, [router]);
+
+    useEffect(() => {
+        // Only fetch conversations if authenticated
+        if (isAuthenticated !== true) return;
+
         async function fetchConversations() {
             try {
                 const res = await fetch('/api/messages');
@@ -40,7 +71,7 @@ export default function MessagesPage() {
         }
 
         fetchConversations();
-    }, []);
+    }, [isAuthenticated]);
 
     const formatTime = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -63,6 +94,15 @@ export default function MessagesPage() {
             p.name?.toLowerCase().includes(search.toLowerCase())
         )
     );
+
+    // Show loading spinner while checking authentication
+    if (isAuthenticated === null || !isAuthenticated) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-2xl mx-auto py-6">

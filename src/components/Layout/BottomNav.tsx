@@ -2,15 +2,42 @@
 
 import { Home, Compass, PlusCircle, Bell, User } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+
+interface UserProfile {
+    username: string;
+    image?: string | null;
+}
 
 export default function BottomNav() {
     const pathname = usePathname();
+    const router = useRouter();
+    const [user, setUser] = useState<UserProfile | null>(null);
     const [notificationCount, setNotificationCount] = useState(0);
 
-    // Fetch notification count
+    // Fetch user authentication state
     useEffect(() => {
+        async function fetchUser() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.user) {
+                        setUser(data.user);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch user:', error);
+            }
+        }
+        fetchUser();
+    }, []);
+
+    // Fetch notification count (only if authenticated)
+    useEffect(() => {
+        if (!user) return;
+
         async function fetchNotifications() {
             try {
                 const res = await fetch('/api/notifications');
@@ -27,19 +54,22 @@ export default function BottomNav() {
         // Refresh every 30 seconds
         const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
-    }, []);
+    }, [user]);
 
     const isActive = (path: string) => {
         if (path === '/') return pathname === '/';
         return pathname?.startsWith(path);
     };
 
+    // Define which items require authentication
+    const authRequiredPaths = ['/submit', '/notifications', '/profile'];
+
     const navItems = [
-        { href: '/', icon: Home, label: 'Home' },
-        { href: '/explore', icon: Compass, label: 'Explore' },
-        { href: '/submit', icon: PlusCircle, label: 'Post', primary: true },
-        { href: '/notifications', icon: Bell, label: 'Alerts', badge: notificationCount },
-        { href: '/profile', icon: User, label: 'Profile' },
+        { href: '/', icon: Home, label: 'Home', requiresAuth: false },
+        { href: '/explore', icon: Compass, label: 'Explore', requiresAuth: false },
+        { href: '/submit', icon: PlusCircle, label: 'Post', primary: true, requiresAuth: true },
+        { href: '/notifications', icon: Bell, label: 'Alerts', badge: notificationCount, requiresAuth: true },
+        { href: '/profile', icon: User, label: 'Profile', requiresAuth: true },
     ];
 
     return (
@@ -51,14 +81,23 @@ export default function BottomNav() {
             }}
         >
             <div className="flex items-center justify-around h-full px-2">
-                {navItems.map(({ href, icon: Icon, label, primary, badge }) => {
+                {navItems.map(({ href, icon: Icon, label, primary, badge, requiresAuth }) => {
                     const active = isActive(href);
+
+                    // Handle click for auth-required items
+                    const handleClick = (e: React.MouseEvent) => {
+                        if (requiresAuth && !user) {
+                            e.preventDefault();
+                            router.push(`/login?returnTo=${encodeURIComponent(href)}`);
+                        }
+                    };
 
                     if (primary) {
                         return (
                             <Link
                                 key={href}
                                 href={href}
+                                onClick={handleClick}
                                 className="flex flex-col items-center justify-center min-w-[56px] -mt-6"
                             >
                                 <div className="bg-primary text-primary-content rounded-full p-3 shadow-lg hover:scale-110 transition-transform touch-active">
@@ -73,14 +112,16 @@ export default function BottomNav() {
                         <Link
                             key={href}
                             href={href}
+                            onClick={handleClick}
                             className={`flex flex-col items-center justify-center min-w-[56px] min-h-[56px] rounded-lg transition-colors touch-active relative ${active
-                                    ? 'text-primary'
-                                    : 'text-base-content/60 hover:text-base-content hover:bg-base-content/5'
+                                ? 'text-primary'
+                                : 'text-base-content/60 hover:text-base-content hover:bg-base-content/5'
                                 }`}
                         >
                             <div className="relative">
                                 <Icon className={`w-6 h-6 ${active ? 'fill-current' : ''}`} />
-                                {badge && badge > 0 && (
+                                {/* Only show badge if user is authenticated and badge exists */}
+                                {badge && badge > 0 && user && (
                                     <span className="absolute -top-1 -right-1 bg-error text-error-content text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
                                         {badge > 9 ? '9+' : badge}
                                     </span>

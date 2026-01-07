@@ -5,11 +5,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Home, Flame, TrendingUp, ChevronDown, MessageCircle, Shield,
     HelpCircle, FileText, Settings, Sparkles, Compass, Radio,
-    MessageSquare, Wifi, RotateCcw, ArrowRight
+    MessageSquare, Wifi, RotateCcw, ArrowRight, LogIn, UserPlus
 } from 'lucide-react';
 import Link from 'next/link';
 import UserCommunitiesList from './UserCommunitiesList';
 import { useLiveSignal } from '@/hooks/useLiveSignal';
+
+interface UserProfile {
+    username: string;
+    image?: string | null;
+}
 
 interface LiveThread {
     id: string;
@@ -31,6 +36,7 @@ interface ResumeConversation {
 }
 
 export default function SidebarClient() {
+    const [user, setUser] = useState<UserProfile | null>(null);
     const [liveCount, setLiveCount] = useState(0);
     const [liveThreads, setLiveThreads] = useState<LiveThread[]>([]);
     const [resumeConversations, setResumeConversations] = useState<ResumeConversation[]>([]);
@@ -39,12 +45,32 @@ export default function SidebarClient() {
     const [loadingResume, setLoadingResume] = useState(true);
     const [resumeOpen, setResumeOpen] = useState(true);
 
+    // Fetch user authentication state
+    useEffect(() => {
+        async function fetchUser() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.user) {
+                        setUser(data.user);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch user:', error);
+            }
+        }
+        fetchUser();
+    }, []);
+
     // Real-time updates
     const { isConnected } = useLiveSignal({
         onActivity: useCallback(() => {
             fetchLiveThreads();
-            fetchResumeConversations();
-        }, []),
+            if (user) {
+                fetchResumeConversations();
+            }
+        }, [user]),
     });
 
     // Fetch live threads
@@ -79,8 +105,12 @@ export default function SidebarClient() {
         }
     }, []);
 
-    // Fetch resume conversations
+    // Fetch resume conversations (only if authenticated)
     const fetchResumeConversations = useCallback(async () => {
+        if (!user) {
+            setLoadingResume(false);
+            return;
+        }
         try {
             const res = await fetch('/api/user/resume?limit=3');
             if (res.ok) {
@@ -109,7 +139,7 @@ export default function SidebarClient() {
         } finally {
             setLoadingResume(false);
         }
-    }, []);
+    }, [user]);
 
     useEffect(() => {
         fetchLiveThreads();
@@ -143,6 +173,29 @@ export default function SidebarClient() {
 
     return (
         <div className="h-full w-full bg-base-100 lg:bg-transparent p-4 overflow-y-auto custom-scrollbar">
+
+            {/* Auth Prompt for Unauthenticated Users */}
+            {!user && (
+                <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
+                    <p className="text-xs text-base-content/70 mb-3">Sign in to unlock all features</p>
+                    <div className="flex flex-col gap-2">
+                        <Link
+                            href="/login"
+                            className="btn btn-sm btn-primary gap-2 w-full"
+                        >
+                            <LogIn className="w-4 h-4" />
+                            Sign In
+                        </Link>
+                        <Link
+                            href="/register"
+                            className="btn btn-sm btn-outline btn-primary gap-2 w-full"
+                        >
+                            <UserPlus className="w-4 h-4" />
+                            Register
+                        </Link>
+                    </div>
+                </div>
+            )}
 
             {/* Main Navigation */}
             <ul className="menu menu-md p-0 mb-4">
@@ -194,18 +247,21 @@ export default function SidebarClient() {
                         </span>
                     </Link>
                 </li>
-                <li>
-                    <Link href="/messages" className="hover:bg-base-200 font-medium">
-                        <MessageCircle className="w-5 h-5" />
-                        Messages
-                    </Link>
-                </li>
+                {/* Messages - Only for authenticated users */}
+                {user && (
+                    <li>
+                        <Link href="/messages" className="hover:bg-base-200 font-medium">
+                            <MessageCircle className="w-5 h-5" />
+                            Messages
+                        </Link>
+                    </li>
+                )}
             </ul>
 
             <div className="divider my-0 mb-3 h-px bg-base-content/5"></div>
 
-            {/* RESUME Section - Primary Entry Point */}
-            {resumeCount > 0 && (
+            {/* RESUME Section - Only for authenticated users */}
+            {user && resumeCount > 0 && (
                 <>
                     <div className="mb-3">
                         <button
